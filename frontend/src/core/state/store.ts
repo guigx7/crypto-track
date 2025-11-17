@@ -4,6 +4,7 @@ import uiSlice from "./ui.slice";
 import realtimeSlice from "./realtime.slice";
 import coinsSlice from "./coins/coins.slice";
 import coinDetailsSlice from "./coin-details/coin-details.slice";
+import favoritesSlice from "./favorites/favorites.slice";
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     ui: uiSlice,
     realtime: realtimeSlice,
     coins: coinsSlice,
-    coinDetails: coinDetailsSlice
+    coinDetails: coinDetailsSlice,
+    favorites: favoritesSlice
   }
 });
 
