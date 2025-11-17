@@ -33,6 +33,7 @@ export default function CoinsList() {
         {data.map((c) => (
           <CoinCard
             key={c.id}
+            id={c.id}
             name={c.name}
             symbol={c.symbol}
             image={c.image}

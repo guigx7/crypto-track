@@ -3,6 +3,7 @@ import Login from "./auth/login/login";
 import Register from "./auth/register/register";
 import Dashboard from "./auth/dashboard/dashboard";
 import CoinsList from "./coins/coins-list";
+import CoinDetails from "./coins/coin-details";
 
 export function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ export function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/coins" element={<CoinsList />} />
+        <Route path="/coins/:id" element={<CoinDetails />} />
       </Routes>
     </BrowserRouter>
   );

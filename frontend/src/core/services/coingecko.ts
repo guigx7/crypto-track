@@ -7,3 +7,15 @@ export async function fetchCoins() {
   const res = await axios.get(url);
   return res.data;
 }
+
+export async function fetchCoinDetails(id: string) {
+  const url = `https://api.coingecko.com/api/v3/coins/${id}`;
+  const res = await axios.get(url);
+  return res.data;
+}
+
+export async function fetchCoinHistory(id: string) {
+  const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=7`;
+  const res = await axios.get(url);
+  return res.data.prices;
+}
