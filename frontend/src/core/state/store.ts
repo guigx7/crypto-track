@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "./auth.slice";
 import uiSlice from "./ui.slice";
 import realtimeSlice from "./realtime.slice";
+import coinsSlice from "./coins/coins.slice";
 
 export const store = configureStore({
   reducer: {
     auth: authSlice,
     ui: uiSlice,
-    realtime: realtimeSlice
+    realtime: realtimeSlice,
+    coins: coinsSlice
   }
 });
 
