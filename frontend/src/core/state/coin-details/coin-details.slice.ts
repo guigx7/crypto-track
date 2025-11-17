@@ -36,8 +36,13 @@ const slice = createSlice({
     setHistory(state, action: PayloadAction<number[][]>) {
       state.history = action.payload;
     },
+    clearDetails(state) {
+      state.data = null;
+      state.history = [];
+      state.loading = false;
+    },
   },
 });
 
-export const { setLoading, setDetails, setHistory } = slice.actions;
+export const { setLoading, setDetails, setHistory, clearDetails } = slice.actions;
 export default slice.reducer;

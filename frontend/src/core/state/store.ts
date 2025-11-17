@@ -5,6 +5,8 @@ import realtimeSlice from "./realtime.slice";
 import coinsSlice from "./coins/coins.slice";
 import coinDetailsSlice from "./coin-details/coin-details.slice";
 import favoritesSlice from "./favorites/favorites.slice";
+import portfolioSlice from "./portfolio/portfolio.slice";
+import allCoinsSlice from "./coins/all-coins.slice";
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +15,9 @@ export const store = configureStore({
     realtime: realtimeSlice,
     coins: coinsSlice,
     coinDetails: coinDetailsSlice,
-    favorites: favoritesSlice
+    favorites: favoritesSlice,
+    portfolio: portfolioSlice,
+    allCoins: allCoinsSlice
   }
 });
 

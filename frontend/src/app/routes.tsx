@@ -5,7 +5,7 @@ import CoinsList from "./coins/coins-list";
 import CoinDetails from "./coins/coin-details";
 import Favorites from "./favorites/favorites";
 import { AppLayout } from "../components/layout/app-layout";
-import Dashboard from "./auth/dashboard/dashboard";
+import Dashboard from "./dashboard/dashboard";
 
 export function AppRoutes() {
   return (

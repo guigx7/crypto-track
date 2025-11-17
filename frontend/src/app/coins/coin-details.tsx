@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoinDetails, fetchCoinHistory } from "../../core/services/coingecko";
-import { setLoading, setDetails, setHistory } from "../../core/state/coin-details/coin-details.slice";
+import { setLoading, setDetails, setHistory, clearDetails } from "../../core/state/coin-details/coin-details.slice";
 import { Loader } from "../../components/ui/loader";
 import { Card } from "../../components/ui/card";
 import { InfoRow } from "../../components/ui/info-row";
@@ -13,21 +13,54 @@ export default function CoinDetails() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { data, history, loading } = useSelector((s: RootState) => s.coinDetails);
+  const coinsList = useSelector((s: RootState) => s.coins.data);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const coinFromList = coinsList.find((coin: any) => coin.id === id);
 
   useEffect(() => {
     if (!id) return;
 
+    dispatch(clearDetails());
     dispatch(setLoading(true));
 
-    fetchCoinDetails(id).then((details) => {
+    const detailsPromise = fetchCoinDetails(id).then((details) => {
       dispatch(setDetails(details));
+      dispatch(setLoading(false));
+      return details;
     });
 
-    fetchCoinHistory(id).then((prices) => {
+    const historyPromise = fetchCoinHistory(id).then((prices) => {
       dispatch(setHistory(prices));
+      return prices;
+    });
+
+    Promise.all([detailsPromise, historyPromise]).catch((error) => {
+      console.error("Erro ao carregar dados da moeda:", error);
       dispatch(setLoading(false));
     });
-  }, [id]);
+
+    return () => {
+      dispatch(clearDetails());
+    };
+  }, [id, dispatch]);
+
+  if (loading && !data && coinFromList) {
+    return (
+      <div className="min-h-screen bg-black text-white p-6">
+        <h1 className="text-3xl font-bold mb-6">{coinFromList.name}</h1>
+        <Card className="mb-6">
+          <InfoRow label="Preço atual" value={`$${coinFromList.current_price.toFixed(2)}`} />
+          <InfoRow
+            label="Variação 24h"
+            value={`${coinFromList.price_change_percentage_24h >= 0 ? '+' : ''}${coinFromList.price_change_percentage_24h.toFixed(2)}%`}
+          />
+        </Card>
+        <div className="flex justify-center items-center h-80">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !data)
     return (
