@@ -23,7 +23,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-black">
       <Card className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4">Criar Conta</h1>
+        <h1 className="text-2xl font-bold mb-4 text-white">Criar Conta</h1>
 
         <div className="flex flex-col gap-4">
           <Input

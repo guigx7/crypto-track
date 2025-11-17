@@ -24,7 +24,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-black">
       <Card className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4">Entrar</h1>
+        <h1 className="text-2xl font-bold mb-4 text-white">Entrar</h1>
 
         <div className="flex flex-col gap-4">
           <Input
