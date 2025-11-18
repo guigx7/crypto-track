@@ -1,6 +1,8 @@
+import { ReactNode } from "react";
+
 interface Props {
   label: string;
-  value: string | number;
+  value: string | number | ReactNode;
 }
 
 export function InfoRow({ label, value }: Props) {

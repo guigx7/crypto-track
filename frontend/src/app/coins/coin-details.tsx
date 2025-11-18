@@ -10,6 +10,29 @@ import { InfoRow } from "../../components/ui/info-row";
 import type { RootState } from "../../core/state/store";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
+function formatPriceChange(value: number): { text: string; className: string } {
+  const rounded = Math.round(value * 100) / 100;
+
+  if (rounded === 0) {
+    return {
+      text: "0.00%",
+      className: "text-[#CCCCCC]"
+    };
+  }
+
+  if (value > 0) {
+    return {
+      text: `+${rounded.toFixed(2)}%`,
+      className: "text-green-400"
+    };
+  }
+
+  return {
+    text: `${rounded.toFixed(2)}%`,
+    className: "text-red-400"
+  };
+}
+
 export default function CoinDetails() {
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -55,7 +78,11 @@ export default function CoinDetails() {
           <InfoRow label="Preço atual" value={`$${coinFromList.current_price.toFixed(2)}`} />
           <InfoRow
             label="Variação 24h"
-            value={`${coinFromList.price_change_percentage_24h >= 0 ? '+' : ''}${coinFromList.price_change_percentage_24h.toFixed(2)}%`}
+            value={
+              <span className={formatPriceChange(coinFromList.price_change_percentage_24h).className}>
+                {formatPriceChange(coinFromList.price_change_percentage_24h).text}
+              </span>
+            }
           />
         </Card>
         <div className="flex justify-center items-center h-80">
@@ -87,7 +114,14 @@ export default function CoinDetails() {
       <Card className="mb-6">
         <InfoRow label="Preço atual" value={`$${data.market_data.current_price.usd}`} />
         <InfoRow label="Market Cap" value={`$${data.market_data.market_cap.usd}`} />
-        <InfoRow label="Variação 24h" value={`${data.market_data.price_change_percentage_24h}%`} />
+        <InfoRow
+          label="Variação 24h"
+          value={
+            <span className={formatPriceChange(data.market_data.price_change_percentage_24h).className}>
+              {formatPriceChange(data.market_data.price_change_percentage_24h).text}
+            </span>
+          }
+        />
         <InfoRow label="Supply" value={data.market_data.circulating_supply} />
       </Card>
 

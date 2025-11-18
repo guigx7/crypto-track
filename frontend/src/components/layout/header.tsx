@@ -28,10 +28,6 @@ export function Header() {
           Coins
         </Link>
 
-        <Link to="/favorites" className="hover:text-white transition">
-          Favorites
-        </Link>
-
         <Button className="ml-4" onClick={logout}>
           Sair
         </Button>

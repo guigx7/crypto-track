@@ -1,9 +1,5 @@
 import { Link } from "react-router-dom";
 import { Card } from "./ui/card";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../core/state/store";
-import { addFavorite, removeFavorite } from "../core/state/favorites/favorites.slice";
-import { apiAddFavorite, apiRemoveFavorite } from "../core/services/favorites";
 
 interface Props {
   id: string;
@@ -14,29 +10,35 @@ interface Props {
   change: number;
 }
 
-export function CoinCard({ name, symbol, image, price, change, id }: Props) {
-  const dispatch = useDispatch();
-  const favorites = useSelector((s: RootState) => s.favorites.data);
-
-  const isFav = favorites.includes(id);
-
-  async function toggleFav(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (isFav) {
-      await apiRemoveFavorite(id);
-      dispatch(removeFavorite(id));
-    } else {
-      await apiAddFavorite(id);
-      dispatch(addFavorite(id));
-    }
+function formatPriceChange(value: number): { text: string; className: string } {
+  const rounded = Math.round(value * 100) / 100;
+  
+  if (rounded === 0) {
+    return {
+      text: "0.00%",
+      className: "text-[#CCCCCC]"
+    };
   }
+  
+  if (value > 0) {
+    return {
+      text: `+${rounded.toFixed(2)}%`,
+      className: "text-green-500"
+    };
+  }
+  
+  return {
+    text: `${rounded.toFixed(2)}%`,
+    className: "text-red-500"
+  };
+}
+
+export function CoinCard({ name, symbol, image, price, change, id }: Props) {
+  const changeFormatted = formatPriceChange(change);
 
   return (
     <Link to={`/coins/${id}`}>
       <Card className="flex items-center justify-between gap-4 cursor-pointer hover:bg-gray-800 transition">
-
         <div className="flex items-center gap-4">
           <img src={image} className="w-10 h-10" />
 
@@ -48,17 +50,9 @@ export function CoinCard({ name, symbol, image, price, change, id }: Props) {
 
         <div className="text-right">
           <p className="text-lg font-bold">${price.toFixed(2)}</p>
-          <p className={change >= 0 ? "text-green-500" : "text-red-500"}>
-            {change.toFixed(2)}%
+          <p className={changeFormatted.className}>
+            {changeFormatted.text}
           </p>
-        </div>
-
-        <div onClick={toggleFav}>
-          {isFav ? (
-            <span className="text-yellow-400 text-xl">★</span>
-          ) : (
-            <span className="text-gray-500 text-xl">☆</span>
-          )}
         </div>
       </Card>
     </Link>

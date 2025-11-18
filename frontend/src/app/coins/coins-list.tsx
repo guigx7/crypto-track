@@ -70,8 +70,7 @@ export default function CoinsList() {
           <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead className="bg-gray-900 border-b border-gray-700">
               <tr>
-                <th className="px-4 py-3"></th>
-                <th className="px-4 py-3"></th>
+                <th className="px-4 py-3">#</th>
                 <th className="px-4 py-3">Moeda</th>
                 <th className="px-4 py-3">Preço</th>
                 <th className="px-4 py-3">1h</th>
@@ -86,7 +85,7 @@ export default function CoinsList() {
             <tbody>
               {coins.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
                     Nenhuma moeda encontrada
                   </td>
                 </tr>

@@ -15,7 +15,6 @@ interface MarketChartResponse {
 
 export default function Dashboard() {
   const dispatch = useDispatch();
-  const favorites = useSelector((s: RootState) => s.favorites.data);
   const portfolio = useSelector((s: RootState) => s.portfolio.data);
   const coins = useSelector((s: RootState) => s.coins.data);
 
@@ -63,9 +62,8 @@ export default function Dashboard() {
     <div className="min-h-screen text-white p-6">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <KpiCard label="Valor total do portfólio" value={`$${totalUSD.toFixed(2)}`} />
-        <KpiCard label="Favoritos" value={favorites.length} />
         <KpiCard label="Ativos no portfólio" value={portfolio.length} />
       </div>
 
@@ -94,17 +92,6 @@ export default function Dashboard() {
         )}
       </Card>
 
-      <Card className="p-6">
-        <h2 className="text-xl font-bold mb-4">Favoritos Recentes</h2>
-
-        {favorites.length === 0 ? (
-          <p className="text-gray-400">Nenhuma moeda favoritada ainda.</p>
-        ) : (
-          favorites.slice(0, 5).map((id) => (
-            <p key={id} className="border-b border-gray-700 py-2">{id}</p>
-          ))
-        )}
-      </Card>
     </div>
   );
 }
