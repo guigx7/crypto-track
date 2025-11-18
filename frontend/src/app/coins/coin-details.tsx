@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoinDetails, fetchCoinHistory } from "../../core/services/coingecko";
-import { setLoading, setDetails, setHistory, clearDetails } from "../../core/state/coin-details/coin-details.slice";
+import { setLoading, setDetails, setHistory } from "../../core/state/coin-details/coin-details.slice";
 import { Loader } from "../../components/ui/loader";
 import { Card } from "../../components/ui/card";
 import { InfoRow } from "../../components/ui/info-row";

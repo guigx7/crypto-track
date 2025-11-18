@@ -1,50 +1,65 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../core/state/store";
 import { useNavigate } from "react-router-dom";
-import { fetchCoinBasicInfo } from "../../../core/services/coingecko";
-
-const iconCache: Record<string, string> = {};
 
 export function CoinSearch() {
   const nav = useNavigate();
   const allCoins = useSelector((s: RootState) => s.allCoins.data);
   const [query, setQuery] = useState("");
-  const [icons, setIcons] = useState<Record<string, string>>({});
 
-  const results =
-    query.length > 0
-      ? allCoins.filter((c) =>
-        c.name.toLowerCase().includes(query.toLowerCase()) ||
-        c.symbol.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 10)
-      : [];
+  // Função para calcular a pontuação de correspondência
+  const getMatchScore = (coin: { name: string; symbol: string }, searchQuery: string): number => {
+    const lowerQuery = searchQuery.toLowerCase();
+    const lowerName = coin.name.toLowerCase();
+    const lowerSymbol = coin.symbol.toLowerCase();
 
-  useEffect(() => {
-    async function loadIcons() {
-      const newIcons: Record<string, string> = {};
+    // Correspondência exata do símbolo (maior prioridade)
+    if (lowerSymbol === lowerQuery) return 1000;
+    
+    // Correspondência exata do nome
+    if (lowerName === lowerQuery) return 900;
+    
+    // Símbolo começa com a query
+    if (lowerSymbol.startsWith(lowerQuery)) return 800;
+    
+    // Nome começa com a query
+    if (lowerName.startsWith(lowerQuery)) return 700;
+    
+    // Símbolo contém a query
+    if (lowerSymbol.includes(lowerQuery)) return 600;
+    
+    // Nome contém a query
+    if (lowerName.includes(lowerQuery)) return 500;
+    
+    return 0;
+  };
 
-      for (const coin of results) {
-        if (iconCache[coin.id]) {
-          newIcons[coin.id] = iconCache[coin.id];
-        } else {
-          try {
-            const info = await fetchCoinBasicInfo(coin.id);
-            iconCache[coin.id] = info.image;
-            newIcons[coin.id] = info.image;
-          } catch {
-            newIcons[coin.id] = "";
-          }
-        }
-      }
+  // Filtra e ordena os resultados
+  const results = useMemo(() => {
+    if (query.length === 0) return [];
 
-      setIcons((prev) => ({ ...prev, ...newIcons }));
-    }
+    const lowerQuery = query.toLowerCase();
+    
+    // Filtra moedas que correspondem à busca
+    const filtered = allCoins.filter((c) => {
+      const lowerName = c.name.toLowerCase();
+      const lowerSymbol = c.symbol.toLowerCase();
+      return lowerName.includes(lowerQuery) || lowerSymbol.includes(lowerQuery);
+    });
 
-    if (results.length > 0) {
-      loadIcons();
-    }
-  }, [results]);
+    // Ordena por pontuação de correspondência (maior primeiro)
+    const sorted = filtered
+      .map((coin) => ({
+        coin,
+        score: getMatchScore(coin, query)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10) // Limita a 10 resultados
+      .map((item) => item.coin);
+
+    return sorted;
+  }, [query, allCoins]);
 
   function goTo(id: string) {
     setQuery("");
@@ -67,17 +82,12 @@ export function CoinSearch() {
             <li
               key={coin.id}
               onClick={() => goTo(coin.id)}
-              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-800 transition"
+              className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-800 transition"
             >
-              {/* Ícone carregado dinamicamente */}
-              {icons[coin.id] ? (
-                <img src={icons[coin.id]} className="w-6 h-6 rounded-full" />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-gray-700 animate-pulse" />
-              )}
-
-              <span className="text-white font-medium">{coin.name}</span>
-              <span className="text-gray-400 text-sm">{coin.symbol.toUpperCase()}</span>
+              <div className="flex flex-col">
+                <span className="text-white font-medium">{coin.name}</span>
+                <span className="text-gray-400 text-sm">{coin.symbol.toUpperCase()}</span>
+              </div>
             </li>
           ))}
         </ul>

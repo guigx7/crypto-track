@@ -9,8 +9,17 @@ export default function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchAllCoinsList().then((list) => dispatch(setAllCoins(list)));
-  }, []);
+    // Carrega a lista completa de moedas apenas uma vez
+    fetchAllCoinsList()
+      .then((list) => {
+        if (list && Array.isArray(list)) {
+          dispatch(setAllCoins(list));
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar lista de moedas:", error);
+      });
+  }, [dispatch]);
 
   return <AppRoutes />;
 }
