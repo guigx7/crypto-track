@@ -28,7 +28,28 @@ export default function CoinsList() {
         })
         .catch((error) => {
           console.error("Erro ao carregar moedas:", error);
-          dispatch(setLoading(false));
+          const errorMessage = error instanceof Error 
+            ? error.message 
+            : "Erro ao carregar moedas. Tente novamente em alguns segundos.";
+          
+          if (errorMessage.includes("Muitas requisições")) {
+            console.warn("Rate limit atingido. Os dados serão carregados do cache quando disponível.");
+            // Tenta usar dados do cache se disponível
+            setTimeout(() => {
+              fetchCoins()
+                .then((list) => {
+                  if (list && Array.isArray(list)) {
+                    dispatch(setCoins(list));
+                  }
+                  dispatch(setLoading(false));
+                })
+                .catch(() => {
+                  dispatch(setLoading(false));
+                });
+            }, 5000);
+          } else {
+            dispatch(setLoading(false));
+          }
         });
     }
   }, [dispatch, coins.length]);

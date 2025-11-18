@@ -40,9 +40,9 @@ export default function Dashboard() {
   useEffect(() => {
     if (chartData.length === 0) {
       Promise.all([
-        fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7`)
+        fetch(`/api/coingecko/coins/bitcoin/market_chart?vs_currency=usd&days=7`)
           .then((r) => r.json() as Promise<MarketChartResponse>),
-        fetch(`https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7`)
+        fetch(`/api/coingecko/coins/ethereum/market_chart?vs_currency=usd&days=7`)
           .then((r) => r.json() as Promise<MarketChartResponse>)
       ]).then(([btc, eth]) => {
         const mapped = btc.prices.map((_, i) => ({
@@ -51,6 +51,8 @@ export default function Dashboard() {
           eth: eth.prices[i]?.[1] ?? 0
         }));
         setChartData(mapped);
+      }).catch((error) => {
+        console.error('Erro ao carregar dados do gráfico:', error);
       });
     }
   }, [chartData.length]);

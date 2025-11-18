@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,33 +15,35 @@ export default function CoinDetails() {
   const dispatch = useDispatch();
   const { data, history, loading } = useSelector((s: RootState) => s.coinDetails);
   const coinsList = useSelector((s: RootState) => s.coins.data);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const coinFromList = coinsList.find((coin: any) => coin.id === id);
 
   useEffect(() => {
     if (!id) return;
 
-    dispatch(clearDetails());
     dispatch(setLoading(true));
 
-    const detailsPromise = fetchCoinDetails(id).then((details) => {
-      dispatch(setDetails(details));
-      dispatch(setLoading(false));
-      return details;
-    });
-
-    const historyPromise = fetchCoinHistory(id).then((prices) => {
-      dispatch(setHistory(prices));
-      return prices;
-    });
-
-    Promise.all([detailsPromise, historyPromise]).catch((error) => {
-      console.error("Erro ao carregar dados da moeda:", error);
+    // Carrega detalhes e histórico em paralelo, mas com rate limiting
+    Promise.all([
+      fetchCoinDetails(id).catch((error) => {
+        console.error("Erro ao carregar detalhes:", error);
+        return null;
+      }),
+      fetchCoinHistory(id).catch((error) => {
+        console.error("Erro ao carregar histórico:", error);
+        return null;
+      })
+    ]).then(([details, history]) => {
+      if (details) {
+        dispatch(setDetails(details));
+      }
+      if (history) {
+        dispatch(setHistory(history));
+      }
       dispatch(setLoading(false));
     });
 
     return () => {
-      dispatch(clearDetails());
+      // Cleanup se necessário
     };
   }, [id, dispatch]);
 
@@ -62,17 +65,20 @@ export default function CoinDetails() {
     );
   }
 
-  if (loading || !data)
+  if (loading || !data) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-black text-white">
         <Loader />
       </div>
     );
+  }
 
-  const chartData = history.map(([t, p]) => ({
-    time: new Date(t).toLocaleDateString(),
-    price: p,
-  }));
+  const chartData = history.length > 0
+    ? history.map(([t, p]) => ({
+      time: new Date(t).toLocaleDateString(),
+      price: p,
+    }))
+    : [];
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -86,14 +92,20 @@ export default function CoinDetails() {
       </Card>
 
       <Card className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <XAxis dataKey="time" stroke="#888" />
-            <YAxis stroke="#888" />
-            <Tooltip />
-            <Line type="monotone" dataKey="price" stroke="#3b82f6" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <XAxis dataKey="time" stroke="#888" />
+              <YAxis stroke="#888" />
+              <Tooltip />
+              <Line type="monotone" dataKey="price" stroke="#3b82f6" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex justify-center items-center h-full">
+            <Loader />
+          </div>
+        )}
       </Card>
     </div>
   );
